@@ -110,6 +110,21 @@ class CoffeeMachineTest {
 		assertThat(resultCoffee, isTheSameCoffee(coffee(0, coffeeWeigthGrForStandardSize, waterAmountForStandardSize)));
 	}
 	
+	@Test
+	void makeCoffeeWithoutProperReceiptShouldThrowException() throws MilkProviderException {
+		properPrepareGrinder();
+		var p = CoffeeReceipe.builder()
+						.withMilkAmount(0)
+						.withWaterAmounts(receipts)
+						.build();
+		var mocked = Mockito.mock(CoffeeReceipe.class);
+		when(mocked.getWaterAmount(any(CoffeeSize.class)))
+				.thenReturn(null);
+		when(receipes.getReceipe(any(CoffeType.class))).thenReturn(Optional.of(mocked));
+		
+		assertThrows(UnsupportedCoffeeSizeException.class, () -> coffeeMachine.make(order));
+	}
+	
 	
 	private void prepareSingleReceiptForCoffeeWithMilk(int milkAmout) {
 		receipts = Map.of(CoffeeSize.STANDARD, waterAmountForStandardSize);

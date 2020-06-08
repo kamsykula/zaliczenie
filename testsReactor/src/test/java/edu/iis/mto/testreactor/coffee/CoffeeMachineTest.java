@@ -76,6 +76,13 @@ class CoffeeMachineTest {
 	}
 	
 	
+	@Test
+	void makeCoffeeWithoutReceiptShouldThrowException() {
+		properPrepareGrinder();
+
+		assertThrows(UnsupportedCoffeeException.class, () -> coffeeMachine.make(order));
+	}
+	
 	private void prepareSingleReceiptForCoffeeWithMilk(int milkAmout) {
 		receipts = Map.of(CoffeeSize.STANDARD, waterAmountForStandardSize);
 		when(receipes.getReceipe(any(CoffeType.class)))

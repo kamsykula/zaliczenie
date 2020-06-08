@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import edu.iis.mto.testreactor.coffee.milkprovider.MilkProvider;
 import edu.iis.mto.testreactor.coffee.milkprovider.MilkProviderException;
@@ -96,6 +96,18 @@ class CoffeeMachineTest {
 		InOrder milkProviderCallOrder = Mockito.inOrder(milkProvider);
 		milkProviderCallOrder.verify(milkProvider).heat();
 		milkProviderCallOrder.verify(milkProvider).pour(standardMilkAmout);
+	}
+	
+	@Test
+	void makeCoffeeWithMilkAndWithBrokenMilkProviderShouldReturnCoffeeWithoutMilk() throws MilkProviderException {
+		properPrepareGrinder();
+		prepareSingleReceiptForCoffeeWithMilk(standardMilkAmout);
+		
+		doThrow(MilkProviderException.class).when(milkProvider).heat();
+		
+		Coffee resultCoffee = coffeeMachine.make(order);
+		
+		assertThat(resultCoffee, isTheSameCoffee(coffee(0, coffeeWeigthGrForStandardSize, waterAmountForStandardSize)));
 	}
 	
 	

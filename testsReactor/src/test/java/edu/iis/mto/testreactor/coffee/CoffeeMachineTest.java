@@ -27,30 +27,56 @@ class CoffeeMachineTest {
 	private MilkProvider milkProvider;
 	
 	private CoffeeMachine coffeeMachine;
+	private int standardMilkAmout;
+	private double coffeeWeigthGrForStandardSize;
+	private int waterAmountForStandardSize;
+	private Map<CoffeeSize, Integer> receipts;
+	private CoffeOrder order;
 	
 	@BeforeEach
 	void before() {
+		standardMilkAmout = 10;
+		waterAmountForStandardSize = 100;
+		coffeeWeigthGrForStandardSize = 50d;
+		
+		order = CoffeOrder.builder()
+				.withType(CoffeType.ESPRESSO)
+				.withSize(CoffeeSize.STANDARD)
+				.build();
 		coffeeMachine = new CoffeeMachine(grinder, milkProvider, receipes);
 	}
 	
 	@Test
 	void makeCoffeeWithProperOrderShouldReturnProperCoffee() {
-		var order = CoffeOrder.builder()
-				.withType(CoffeType.ESPRESSO)
-				.withSize(CoffeeSize.STANDARD)
-				.build();
 		
-		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(true);
-		when(grinder.grind(any(CoffeeSize.class))).thenReturn(50d);
-		when(receipes.getReceipe(any(CoffeType.class))).thenReturn(Optional.of(CoffeeReceipe.builder().withMilkAmount(10).withWaterAmounts(Map.of(CoffeeSize.STANDARD, 100)).build()));
+		properPrepareGrinder();
+		properPrepareReceipts();
 		
 		Coffee resultCoffee = coffeeMachine.make(order);
+
+		assertThat(resultCoffee, isTheSameCoffee(coffee(standardMilkAmout, coffeeWeigthGrForStandardSize, waterAmountForStandardSize)));
+	}
+	
+	private void properPrepareReceipts() {
+		receipts = Map.of(CoffeeSize.STANDARD, waterAmountForStandardSize);
+		when(receipes.getReceipe(any(CoffeType.class)))
+				.thenReturn(Optional.of(CoffeeReceipe.builder()
+						.withMilkAmount(standardMilkAmout)
+						.withWaterAmounts(receipts)
+						.build()));
+	}
+	
+	private void properPrepareGrinder() {
+		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(true);
+		when(grinder.grind(any(CoffeeSize.class))).thenReturn(coffeeWeigthGrForStandardSize);
+	}
+	
+	private Coffee coffee(int standardMilkAmout, double coffeeWeigthGrForStandardSize, int waterAmountForStandardSize) {
 		Coffee coffeeToCompare = new Coffee();
-		coffeeToCompare.setMilkAmout(10);
-		coffeeToCompare.setCoffeeWeigthGr(50d);
-		coffeeToCompare.setWaterAmount(100);
-		
-		assertThat(resultCoffee, isTheSameCoffee(coffeeToCompare));
+		coffeeToCompare.setMilkAmout(standardMilkAmout);
+		coffeeToCompare.setCoffeeWeigthGr(coffeeWeigthGrForStandardSize);
+		coffeeToCompare.setWaterAmount(waterAmountForStandardSize);
+		return coffeeToCompare;
 	}
 	
 }

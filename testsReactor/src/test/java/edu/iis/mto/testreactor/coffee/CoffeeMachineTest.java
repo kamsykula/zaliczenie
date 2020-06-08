@@ -111,12 +111,8 @@ class CoffeeMachineTest {
 	}
 	
 	@Test
-	void makeCoffeeWithoutProperReceiptShouldThrowException() throws MilkProviderException {
+	void makeCoffeeWithoutProperReceiptShouldThrowException() {
 		properPrepareGrinder();
-		var p = CoffeeReceipe.builder()
-						.withMilkAmount(0)
-						.withWaterAmounts(receipts)
-						.build();
 		var mocked = Mockito.mock(CoffeeReceipe.class);
 		when(mocked.getWaterAmount(any(CoffeeSize.class)))
 				.thenReturn(null);

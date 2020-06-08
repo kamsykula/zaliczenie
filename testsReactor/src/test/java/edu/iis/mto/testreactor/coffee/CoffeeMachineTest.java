@@ -3,6 +3,7 @@ package edu.iis.mto.testreactor.coffee;
 import static edu.iis.mto.testreactor.coffee.CoffeeMatcher.isTheSameCoffee;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +49,6 @@ class CoffeeMachineTest {
 	
 	@Test
 	void makeCoffeeWithProperOrderShouldReturnProperCoffee() {
-		
 		properPrepareGrinder();
 		properPrepareReceipts();
 		
@@ -56,6 +56,14 @@ class CoffeeMachineTest {
 
 		assertThat(resultCoffee, isTheSameCoffee(coffee(standardMilkAmout, coffeeWeigthGrForStandardSize, waterAmountForStandardSize)));
 	}
+	
+	@Test
+	void whenCoffeeMachineCannotGrindBeansCoffeeMachineShouldThrowException() {
+		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(false);
+
+		assertThrows(NoCoffeeBeansException.class, ()->coffeeMachine.make(order));
+	}
+	
 	
 	private void properPrepareReceipts() {
 		receipts = Map.of(CoffeeSize.STANDARD, waterAmountForStandardSize);

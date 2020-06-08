@@ -8,10 +8,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import edu.iis.mto.testreactor.coffee.milkprovider.MilkProvider;
+import edu.iis.mto.testreactor.coffee.milkprovider.MilkProviderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
@@ -82,6 +85,19 @@ class CoffeeMachineTest {
 
 		assertThrows(UnsupportedCoffeeException.class, () -> coffeeMachine.make(order));
 	}
+	
+	@Test
+	void makeCoffeeWithMilkShouldUseMilkProvider() throws MilkProviderException {
+		properPrepareGrinder();
+		prepareSingleReceiptForCoffeeWithMilk(standardMilkAmout);
+		
+		coffeeMachine.make(order);
+		
+		InOrder milkProviderCallOrder = Mockito.inOrder(milkProvider);
+		milkProviderCallOrder.verify(milkProvider).heat();
+		milkProviderCallOrder.verify(milkProvider).pour(standardMilkAmout);
+	}
+	
 	
 	private void prepareSingleReceiptForCoffeeWithMilk(int milkAmout) {
 		receipts = Map.of(CoffeeSize.STANDARD, waterAmountForStandardSize);

@@ -1,5 +1,7 @@
 package edu.iis.mto.testreactor.coffee;
 
+import static edu.iis.mto.testreactor.coffee.CoffeeMatcher.isTheSameCoffee;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -23,6 +25,7 @@ class CoffeeMachineTest {
 	private Grinder grinder;
 	@Mock
 	private MilkProvider milkProvider;
+	
 	private CoffeeMachine coffeeMachine;
 	
 	@BeforeEach
@@ -39,11 +42,15 @@ class CoffeeMachineTest {
 		
 		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(true);
 		when(grinder.grind(any(CoffeeSize.class))).thenReturn(50d);
-		when(receipes.getReceipe(any(CoffeType.class))).thenReturn(Optional.of(CoffeeReceipe.builder().withMilkAmount(0).withWaterAmounts(Map.of(CoffeeSize.STANDARD, 100)).build()));
+		when(receipes.getReceipe(any(CoffeType.class))).thenReturn(Optional.of(CoffeeReceipe.builder().withMilkAmount(10).withWaterAmounts(Map.of(CoffeeSize.STANDARD, 100)).build()));
 		
 		Coffee resultCoffee = coffeeMachine.make(order);
+		Coffee coffeeToCompare = new Coffee();
+		coffeeToCompare.setMilkAmout(10);
+		coffeeToCompare.setCoffeeWeigthGr(50d);
+		coffeeToCompare.setWaterAmount(100);
 		
-		assertNotNull(resultCoffee);
+		assertThat(resultCoffee, isTheSameCoffee(coffeeToCompare));
 	}
 	
 }

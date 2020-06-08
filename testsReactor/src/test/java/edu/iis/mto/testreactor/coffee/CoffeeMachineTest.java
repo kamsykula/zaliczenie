@@ -58,6 +58,17 @@ class CoffeeMachineTest {
 	}
 	
 	@Test
+	void makeCoffeeWithProperOrderWithoutMilkShouldReturnProperCoffeeWithMilk() {
+		properPrepareGrinder();
+		prepareSingleReceiptForCoffeeWithoutMilk();
+		
+		Coffee resultCoffee = coffeeMachine.make(order);
+		
+		assertThat(resultCoffee, isTheSameCoffee(coffee(null, coffeeWeigthGrForStandardSize, waterAmountForStandardSize)));
+	}
+	
+	
+	@Test
 	void whenCoffeeMachineCannotGrindBeansCoffeeMachineShouldThrowException() {
 		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(false);
 		
@@ -74,12 +85,16 @@ class CoffeeMachineTest {
 						.build()));
 	}
 	
+	private void prepareSingleReceiptForCoffeeWithoutMilk() {
+		prepareSingleReceiptForCoffeeWithMilk(0);
+	}
+	
 	private void properPrepareGrinder() {
 		when(grinder.canGrindFor(any(CoffeeSize.class))).thenReturn(true);
 		when(grinder.grind(any(CoffeeSize.class))).thenReturn(coffeeWeigthGrForStandardSize);
 	}
 	
-	private Coffee coffee(int standardMilkAmout, double coffeeWeigthGrForStandardSize, int waterAmountForStandardSize) {
+	private Coffee coffee(Integer standardMilkAmout, Double coffeeWeigthGrForStandardSize, Integer waterAmountForStandardSize) {
 		Coffee coffeeToCompare = new Coffee();
 		coffeeToCompare.setMilkAmout(standardMilkAmout);
 		coffeeToCompare.setCoffeeWeigthGr(coffeeWeigthGrForStandardSize);
